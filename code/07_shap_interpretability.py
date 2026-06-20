@@ -70,7 +70,7 @@ CUE_LABELS_EN = {
 }
 
 # ---------------------------------------------------------------- figures ----
-plt.rcParams["font.sans-serif"] = ["Microsoft YaHei", "SimHei", "DejaVu Sans"]
+plt.rcParams["font.sans-serif"] = ["Times New Roman", "Microsoft YaHei", "SimHei", "DejaVu Sans"]
 plt.rcParams["axes.unicode_minus"] = False
 
 
@@ -78,6 +78,62 @@ def save_fig(fig, outdir, stem):
     for ext in ("png", "pdf"):
         fig.savefig(f"{outdir}/{stem}.{ext}", dpi=300, bbox_inches="tight")
     plt.close(fig)
+
+
+def gray_beeswarm(sv, X, presence, outdir, stem, xlabel, max_display=10, tick_font=None):
+    """House-style grayscale beeswarm.
+
+    presence: boolean DataFrame/array (filled black = True, open circle = False);
+    pass None to encode feature value by gray level instead (continuous features).
+    """
+    sv = np.asarray(sv)
+    mean_abs = np.abs(sv).mean(axis=0)
+    order = np.argsort(mean_abs)[::-1][:max_display][::-1]
+    rng = np.random.RandomState(0)
+    names = list(X.columns)
+    fig, ax = plt.subplots(figsize=(8, 0.5 * len(order) + 1.4))
+    for row, j in enumerate(order):
+        vals = sv[:, j]
+        idx = np.arange(len(vals))
+        if len(idx) > 2500:
+            idx = rng.choice(idx, 2500, replace=False)
+        yy = row + (rng.rand(len(idx)) - 0.5) * 0.55
+        if presence is not None:
+            pres = np.asarray(presence)[idx, j].astype(bool)
+            ax.scatter(vals[idx][~pres], yy[~pres], s=9, facecolors="white",
+                       edgecolors="#888888", linewidths=0.4, zorder=2)
+            ax.scatter(vals[idx][pres], yy[pres], s=9, color="#000000",
+                       linewidths=0, zorder=3)
+        else:
+            v = np.asarray(X.iloc[:, j], dtype=float)[idx]
+            lo, hi = np.nanpercentile(v, 5), np.nanpercentile(v, 95)
+            t = np.clip((v - lo) / (hi - lo + 1e-12), 0, 1)
+            ax.scatter(vals[idx], yy, s=9, c=t, cmap="gray_r", vmin=0, vmax=1,
+                       edgecolors="#555555", linewidths=0.25, zorder=2)
+    ax.axvline(0, color="#555555", lw=0.8, zorder=1)
+    ax.set_yticks(range(len(order)))
+    ax.set_yticklabels([names[j] for j in order],
+                       **({'fontfamily': tick_font} if tick_font else {}))
+    ax.set_xlabel(xlabel)
+    ax.spines["top"].set_visible(False)
+    ax.spines["right"].set_visible(False)
+    ax.grid(axis="y", linestyle=(0, (1, 4)), alpha=0.55)
+    if presence is not None:
+        from matplotlib.lines import Line2D
+        ax.legend(handles=[
+            Line2D([], [], marker="o", ls="", color="#000000", label="feature present / high"),
+            Line2D([], [], marker="o", ls="", markerfacecolor="white",
+                   markeredgecolor="#888888", label="feature absent / low"),
+        ], loc="lower right", fontsize=8, frameon=False)
+    else:
+        import matplotlib.cm as cm
+        from matplotlib.colors import Normalize
+        cb = fig.colorbar(cm.ScalarMappable(norm=Normalize(0, 1), cmap="gray_r"),
+                          ax=ax, fraction=0.04, pad=0.02, ticks=[0, 1])
+        cb.ax.set_yticklabels(["Low", "High"])
+        cb.set_label("Feature value", fontsize=8)
+    fig.tight_layout()
+    save_fig(fig, outdir, stem)
 
 
 def to_py(o):
@@ -257,15 +313,15 @@ def analysis_a1(seg, outdir):
     expl = shap.TreeExplainer(mdl)
     sv = shap_values_for_class(expl, X, class_idx)
 
-    fig = plt.figure(figsize=(8, 4.5))
-    shap.summary_plot(sv, X, show=False, max_display=10)
-    plt.gcf().axes[0].set_xlabel('SHAP value (impact on "verifiable" class)')
-    save_fig(plt.gcf(), outdir, "fig_shap_A1_beeswarm")
+    pres = (X.values > np.median(X.values, axis=0)) | ((X.values > 0) & (np.median(X.values, axis=0) == 0))
+    gray_beeswarm(sv, X, pres, outdir, "fig_shap_A1_beeswarm",
+                  'SHAP value (impact on "verifiable" class)', max_display=10)
 
     mean_abs = np.abs(sv).mean(axis=0)
     order = np.argsort(mean_abs)
     fig, ax = plt.subplots(figsize=(8, 4.2))
-    ax.barh(np.array(X.columns)[order], mean_abs[order], color="#1f77b4")
+    ax.barh(np.array(X.columns)[order], mean_abs[order], color="0.2")
+    ax.spines["top"].set_visible(False); ax.spines["right"].set_visible(False)
     ax.set_xlabel('Mean |SHAP value| (impact on "verifiable" class)')
     save_fig(fig, outdir, "fig_shap_A1_bar")
 
@@ -367,28 +423,29 @@ def analysis_a2(seg, outdir):
     # horizontal bar: top 25 n-grams, color by direction
     fig, ax = plt.subplots(figsize=(8.5, 8))
     dd = top_df.iloc[::-1]
-    colors = ["#d62728" if d <= 0 else "#1f77b4" for d in dd["mean_shap_when_present"]]
+    colors = ["white" if d <= 0 else "0.15" for d in dd["mean_shap_when_present"]]
+    edges = ["0.15" if d <= 0 else "none" for d in dd["mean_shap_when_present"]]
     ylabels = [f'"{r.ngram}"  [{r.cue_dimension}]' for r in dd.itertuples()]
-    ax.barh(np.arange(len(dd)), dd["mean_abs_shap"], color=colors)
+    ax.barh(np.arange(len(dd)), dd["mean_abs_shap"], color=colors, edgecolor=edges, hatch="")
+    ax.spines["top"].set_visible(False); ax.spines["right"].set_visible(False)
     ax.set_yticks(np.arange(len(dd)))
-    ax.set_yticklabels(ylabels, fontsize=9)
+    ax.set_yticklabels(ylabels, fontsize=9, fontfamily="Microsoft YaHei")
     ax.set_xlabel('Mean |SHAP value| (impact on "verifiable" class)')
     from matplotlib.patches import Patch
     ax.legend(
         handles=[
-            Patch(color="#1f77b4", label="pushes toward verifiable when present"),
-            Patch(color="#d62728", label="pushes away from verifiable when present"),
+            Patch(color="0.15", label="pushes toward verifiable when present"),
+            Patch(facecolor="white", edgecolor="0.15", label="pushes away from verifiable when present"),
         ],
         loc="lower right", fontsize=9,
     )
     save_fig(fig, outdir, "fig_shap_A2_topngram")
 
     # beeswarm (top 20)
-    sub_df = pd.DataFrame(X_sub, columns=feat_names)
-    fig = plt.figure(figsize=(8, 7))
-    shap.summary_plot(sv, sub_df, show=False, max_display=20)
-    plt.gcf().axes[0].set_xlabel('SHAP value (impact on "verifiable" class)')
-    save_fig(plt.gcf(), outdir, "fig_shap_A2_beeswarm")
+    sub_df = pd.DataFrame(X_sub, columns=[f'"{n}"' for n in feat_names])
+    gray_beeswarm(sv, sub_df, (X_sub > 0), outdir, "fig_shap_A2_beeswarm",
+                  'SHAP value (impact on "verifiable" class)', max_display=20,
+                  tick_font="Microsoft YaHei")
 
     # convergent-validity tally
     tally = top_df["cue_dimension"].apply(lambda s: "other" if s == "other" else "mapped")
@@ -468,12 +525,12 @@ def analysis_b(event_panel_path, seg, feat, outdir):
         "Q_m1": "Baseline Tobin's Q (t-1)", "first_ai_year": "First disclosure year",
         "N_Segments": "N GenAI segments", "N_Verifiable": "N verifiable segments",
         "Verifiable_Share": "Verifiable share", "Mean_Verifiable_Score": "Mean verifiability score",
-        "type_verifiable": "Type: verifiable", "type_soft_substantive": "Type: soft-substantive",
-        "share_has_completion": "Cue share: implementation verb",
-        "share_has_quant": "Cue share: quantified rollout",
-        "share_has_artifact": "Cue share: product/tool",
-        "share_has_partner": "Cue share: partner/customer",
-        "share_has_current": "Cue share: time anchoring",
+        "type_verifiable": "Type = verifiable", "type_soft_substantive": "Type = soft-substantive",
+        "share_has_completion": "Cue share - implementation verb",
+        "share_has_quant": "Cue share - quantified rollout",
+        "share_has_artifact": "Cue share - product/tool",
+        "share_has_partner": "Cue share - partner/customer",
+        "share_has_current": "Cue share - time anchoring",
     }
 
     out = {"n": n}
@@ -502,10 +559,8 @@ def analysis_b(event_panel_path, seg, feat, outdir):
         random_state=SEED, verbose=-1,
     ).fit(Xf, df["Q_p1"].values)
     sv = shap.TreeExplainer(mdl).shap_values(Xf)
-    fig = plt.figure(figsize=(8, 6))
-    shap.summary_plot(np.asarray(sv), Xf, show=False, max_display=15)
-    plt.gcf().axes[0].set_xlabel("SHAP value (impact on Tobin's Q at t+1)")
-    save_fig(plt.gcf(), outdir, "fig_shap_B_beeswarm")
+    gray_beeswarm(np.asarray(sv), Xf, None, outdir, "fig_shap_B_beeswarm",
+                  "SHAP value (impact on Tobin's Q at t+1)", max_display=15)
 
     out["primary_outcome"] = (
         "TobinQ(t+1) level with TobinQ(t-1) as baseline feature (more stable CV R^2 and "

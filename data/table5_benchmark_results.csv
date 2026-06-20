@@ -1,0 +1,6 @@
+﻿method,kappa,macro_f1,verifiable_f1,accuracy
+"cue rule (5 cues, deterministic)",0.231,0.615,0.473,0.667
+logistic regression (5 cues),0.209,0.601,0.47,0.645
+gradient-boosted trees (5 cues),0.23,0.603,0.379,0.728
+logistic regression (TF-IDF char n-gram),0.447,0.723,0.596,0.78
+logistic regression (bge-large-zh embeddings),0.547,0.771,0.697,0.795

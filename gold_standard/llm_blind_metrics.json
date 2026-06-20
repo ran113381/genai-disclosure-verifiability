@@ -1,0 +1,28 @@
+{
+  "reference": "A/B two-coder consensus (n=174)",
+  "note": "blind, temperature 0, construct-definition-only prompts (scripts 121/123); scored vs human consensus",
+  "metrics": {
+    "Claude_Sonnet_4_5_vs_consensus": {
+      "n": 174,
+      "kappa_3class": 0.699,
+      "pct_agree": 0.805,
+      "kappa_binary": 0.662,
+      "spearman_rho": 0.873,
+      "rho_p": "1.4e-55"
+    },
+    "GPT_class_vs_consensus": {
+      "n": 152,
+      "kappa_3class": 0.541,
+      "pct_agree": 0.697,
+      "kappa_binary": 0.547,
+      "spearman_rho": 0.756,
+      "rho_p": "2.0e-29"
+    },
+    "inter_model_Claude_vs_GPT": {
+      "n": 152,
+      "kappa_3class": 0.671,
+      "pct_agree": 0.796,
+      "spearman_rho": 0.8
+    }
+  }
+}

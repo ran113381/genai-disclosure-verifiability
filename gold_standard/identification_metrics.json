@@ -1,0 +1,31 @@
+{
+  "stage": "identification (binary: GenAI disclosure vs not)",
+  "n": 600,
+  "gold_positive_rate": 0.3517,
+  "machine_vs_gold": {
+    "accuracy": 0.8517,
+    "GenAI_precision": 0.7033,
+    "GenAI_recall": 1.0,
+    "GenAI_f1": 0.8258,
+    "cohen_kappa": 0.7033,
+    "confusion_rows_gold_cols_machine": [
+      [
+        300,
+        89
+      ],
+      [
+        0,
+        211
+      ]
+    ]
+  },
+  "inter_coder": {
+    "n": 566,
+    "cohen_kappa": 0.6688,
+    "agreement": 0.8445
+  },
+  "gold_source": {
+    "agreed": 477,
+    "adjudicated": 123
+  }
+}

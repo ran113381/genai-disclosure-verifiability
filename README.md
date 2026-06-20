@@ -5,7 +5,7 @@ Dictionaries, gold-standard annotations, derived data, and code for the paper:
 > **From topic salience to verifiability: constructing and validating a measurement system for corporate generative artificial intelligence disclosure texts**
 > （从话题显著性到可验证性：企业生成式人工智能披露文本的测度体系构建与验证）
 
-The paper builds a verifiability measurement system for corporate technology-disclosure text: a three-tier GenAI dictionary with time-validity constraints, segment-level scoring on five implementation cues (implementation verbs, time anchoring, named products/tools, identifiable partners, measurable rollout), and a three-way classification of first annual-report GenAI disclosures into *verifiable*, *soft-substantive*, and *symbolic*. The measure is cross-validated by human double-blind coding (Cohen's κ = 0.949), blind classification by two independent large language models, and SHAP-based interpretable machine learning, and is externally validated against Chinese A-share market reactions (2015–2024).
+The paper builds a verifiability measurement system for corporate technology-disclosure text: a three-tier GenAI dictionary with time-validity constraints, segment-level scoring on five implementation cues (implementation verbs, time anchoring, named products/tools, identifiable partners, measurable rollout), and a three-way classification of first annual-report GenAI disclosures into *verifiable*, *soft-substantive*, and *symbolic*. The measure is validated in two stages against human gold standards: a **600-passage binary identification** gold standard (dictionary vs. adjudicated human labels, Cohen's κ = 0.703, recall 1.00) for the dictionary-matching stage, and a **180-segment three-way verifiability** gold standard (two-coder reliability κ = 0.949) for the scoring stage. It is further cross-checked by blind classification from two independent large language models and SHAP-based interpretable machine learning, and externally validated against Chinese A-share market reactions (2015–2024).
 
 ## Repository structure
 
@@ -15,12 +15,25 @@ dictionaries/
                                       construction boundaries, and functional roles
                                       (broad narrative / strict main / conservative checks)
 gold_standard/
+  # Stage 2 — verifiability scoring (180 segments, three-way)
   02_gold_standard.xlsx               180 stratified gold-standard segments (60 per class)
                                       with five-cue flags, scores, and consensus labels
   01_blind_coder_A_COMPLETED.xlsx     Independent blind-coding sheet, coder A
   01_blind_coder_B_COMPLETED.xlsx     Independent blind-coding sheet, coder B
   04_kappa_results.xlsx               Inter-coder reliability (Cohen's κ = 0.949)
   coding_codebook.md                  Coding rules given to the blind coders
+  # Stage 1 — dictionary identification (600 passages, binary)
+  identification_gold_standard_600.xlsx                600 passages, two coders fully
+                                      adjudicated (477 agreed + 123 adjudicated); machine vs gold
+  identification_annotation_coder1_2_adjudicated.xlsx  Blind annotation + adjudication +
+                                      sampling metadata + codebook (4 sheets)
+  identification_codebook.md          Binary coding rules (GenAI disclosure vs. not)
+  identification_metrics.json         Reproduced metrics (κ = 0.703, acc 0.852, recall 1.00)
+  # Stage 3 — third-party LLM blind validation (Section 3.5)
+  llm_blind_validation_180.csv        Per-segment blind predictions of both LLMs (Claude
+                                      Sonnet 4.5, GPT-5.5) alongside the human consensus
+  llm_blind_metrics.json              Reproduced LLM blind-validation metrics
+                                      (κ = 0.70 / 0.54 vs consensus; inter-model κ = 0.68)
 data/
   firm_year_text_features.csv         4,242 firm-year aggregated text features
                                       (N_Segments, N_Verifiable, Verifiable_Share,
@@ -41,6 +54,16 @@ code/
                                       (T1 classification, T2 institutional, T3 retail;
                                       API keys are read from a local file, not included)
   07_shap_interpretability.py         LightGBM + SHAP transparency analyses (A1/A2/B)
+  08_gold_standard_evaluation.py      Two-stage human-gold-standard evaluation; reproduces
+                                      κ = 0.703 (identification) and κ = 0.231 (verifiability)
+  09_llm_blind_validation.py          Section 3.5 — re-scores the two LLMs' blind predictions
+                                      against the human consensus (κ = 0.70 Claude / 0.54 GPT)
+  10_benchmark_learned_classifiers.py Table 5 — cue rule vs learned classifiers on the human
+                                      gold standard (rule 0.231 → cues ~0.23 → text ~0.45/0.55)
+  11_confusion_matrix_figure.py       Figure 6 — confusion matrices of the two blind LLMs
+                                      vs the human consensus
+figures/
+  figure6_llm_confusion.{png,pdf}     Generated by code/11
 supplementary/
   online_appendix.pdf                 Supplementary materials (PSM diagnostics, LLM
                                       prompt details, additional descriptives)
@@ -57,11 +80,13 @@ Firm-year type: **verifiable** if the firm-year has at least one verifiable segm
 
 ## Data licensing boundary
 
-Raw annual-report MD&A texts and firm financial data are licensed from commercial databases (CSMAR) and cannot be redistributed. This repository releases all author-constructed artifacts: dictionaries, coding materials, derived segment/firm-year features, and analysis code. The 180 gold-standard segments quote short excerpts from publicly available annual reports for replication of the reliability analysis. Researchers with CSMAR access can rebuild the full pipeline with `code/01` – `code/03`.
+Raw annual-report MD&A texts and firm financial data are licensed from commercial databases (CSMAR) and cannot be redistributed. This repository releases all author-constructed artifacts: dictionaries, coding materials, derived segment/firm-year features, and analysis code. The 180 verifiability and 600 identification gold-standard passages quote short excerpts from publicly available annual reports for replication of the validation analyses; a small number of long identification passages are truncated to 1,500 characters. Researchers with CSMAR access can rebuild the full pipeline with `code/01` – `code/03`.
 
 ## Requirements
 
-Python ≥ 3.10; pandas, numpy, scikit-learn, lightgbm, shap, linearmodels, transformers (for `02`).
+Python ≥ 3.10; pandas, numpy, scikit-learn, lightgbm, shap, linearmodels, scipy, matplotlib,
+transformers (for `02`). `sentence-transformers` + `torch` are optional and only needed to
+reproduce the frozen-transformer benchmark row (κ ≈ 0.55) in `10`; the script runs without them.
 
 ## Citation
 
