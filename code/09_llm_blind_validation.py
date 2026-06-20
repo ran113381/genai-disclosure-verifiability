@@ -2,7 +2,7 @@
 """
 Reproduce the Section 3.5 third-party large-language-model blind validation.
 
-Two independent frontier LLMs (Claude Opus 4.6; a GPT-class model) classified
+Two independent frontier LLMs (Claude Sonnet 4.5; a GPT-class model) classified
 each of the 180 stratified gold segments into {verifiable, soft_substantive,
 symbolic} from the segment text ALONE, given only the construct definition
 (no keyword dictionary, no human labels, no each other's output), temperature 0.
@@ -46,7 +46,7 @@ def main():
     print("=" * 78)
     print("Section 3.5 — LLM blind validation vs A/B human consensus (n = 174)")
     print("=" * 78)
-    score(df["human"], df["claude_cat"], "Claude Opus 4.6 vs human consensus")
+    score(df["human"], df["claude_cat"], "Claude Sonnet 4.5 vs human consensus")
     score(df["human"], df["gpt_cat"],    "GPT-class vs human consensus")
     # inter-model
     dd = df[df["claude_cat"].isin(CATS) & df["gpt_cat"].isin(CATS)]
