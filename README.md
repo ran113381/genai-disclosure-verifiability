@@ -1,4 +1,4 @@
-# Measuring Verifiability in Corporate Generative AI Disclosures
+﻿# Measuring Verifiability in Corporate Generative AI Disclosures
 
 Dictionaries, gold-standard annotations, derived data, and code for the paper:
 
@@ -31,7 +31,7 @@ gold_standard/
   identification_metrics.json         Reproduced metrics (κ = 0.703, acc 0.852, recall 1.00)
   # Stage 3 — third-party LLM blind validation (Section 3.5)
   llm_blind_validation_180.csv        Per-segment blind predictions of both LLMs (Claude
-                                      Sonnet 4.5, GPT-5.5) alongside the human consensus
+                                      Opus 4.6, GPT-5.5) alongside the human consensus
   llm_blind_metrics.json              Reproduced LLM blind-validation metrics
                                       (κ = 0.70 / 0.54 vs consensus; inter-model κ = 0.68)
 data/

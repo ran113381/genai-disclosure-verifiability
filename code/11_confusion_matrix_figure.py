@@ -1,7 +1,7 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
 Reproduce Figure 6 — confusion matrices of the two blind large language models
-(Claude Sonnet 4.5; GPT-5.5) against the human two-coder consensus. Color encodes
+(Claude Opus 4.6; GPT-5.5) against the human two-coder consensus. Color encodes
 row-normalized recovery; annotations are segment counts.
 
 Input : gold_standard/llm_blind_validation_180.csv  (SEG_ID, human, claude_cat, gpt_cat, ...)
@@ -31,7 +31,7 @@ def panel(human, pred):
 
 def main():
     df = pd.read_csv(CSV)
-    panels = [("Claude Sonnet 4.5", *panel(df.human, df.claude_cat)),
+    panels = [("Claude Opus 4.6", *panel(df.human, df.claude_cat)),
               ("GPT-5.5", *panel(df.human, df.gpt_cat))]
 
     plt.rcParams.update({"font.family": "DejaVu Sans", "font.size": 10, "axes.linewidth": 0.8})
