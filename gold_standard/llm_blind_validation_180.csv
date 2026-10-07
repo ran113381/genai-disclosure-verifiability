@@ -173,3 +173,9 @@ SEG_0141,symbolic,symbolic,0,ERR,-1
 SEG_0038,verifiable,verifiable,2,verifiable,2
 SEG_0008,verifiable,verifiable,2,verifiable,2
 SEG_0103,verifiable,verifiable,3,verifiable,2
+SEG_0168,NC,verifiable,2,verifiable,2
+SEG_0136,NC,soft_substantive,1,ERR,-1
+SEG_0133,NC,verifiable,3,verifiable,2
+SEG_0160,NC,symbolic,0,ERR,-1
+SEG_0065,NC,verifiable,2,verifiable,2
+SEG_0012,NC,verifiable,2,verifiable,2

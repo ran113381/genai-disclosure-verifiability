@@ -1,5 +1,5 @@
 {
-  "reference": "A/B two-coder consensus (n=174)",
+  "reference": "A/B two-coder consensus (n=174); inter-model blocks: segments both models labeled (n=156) and, of those, within the consensus (n=152)",
   "note": "blind, temperature 0, construct-definition-only prompts (scripts 121/123); scored vs human consensus",
   "metrics": {
     "Claude_Sonnet_4_5_vs_consensus": {
@@ -23,6 +23,12 @@
       "kappa_3class": 0.671,
       "pct_agree": 0.796,
       "spearman_rho": 0.8
+    },
+    "inter_model_Claude_vs_GPT_both_valid": {
+      "n": 156,
+      "kappa_3class": 0.676,
+      "pct_agree": 0.801,
+      "spearman_rho": 0.803
     }
   }
 }

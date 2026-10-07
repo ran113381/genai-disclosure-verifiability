@@ -33,6 +33,8 @@ gold_standard/
   # Stage 3 — third-party LLM blind validation (Section 3.5)
   llm_blind_validation_180.csv        Per-segment blind predictions of both LLMs (Claude
                                       Sonnet 4.5, GPT-5.5) alongside the human consensus
+                                      (all 180 segments; human = NC for the six without
+                                      two-coder consensus)
   llm_blind_metrics.json              Reproduced LLM blind-validation metrics
                                       (κ = 0.70 / 0.54 vs consensus; inter-model κ = 0.68)
 data/
