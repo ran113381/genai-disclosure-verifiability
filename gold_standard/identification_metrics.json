@@ -1,31 +1,31 @@
 {
   "stage": "identification (binary: GenAI disclosure vs not)",
   "n": 600,
-  "gold_positive_rate": 0.3517,
+  "gold_positive_rate": 0.36,
   "machine_vs_gold": {
-    "accuracy": 0.8517,
-    "GenAI_precision": 0.7033,
+    "accuracy": 0.86,
+    "GenAI_precision": 0.72,
     "GenAI_recall": 1.0,
-    "GenAI_f1": 0.8258,
-    "cohen_kappa": 0.7033,
+    "GenAI_f1": 0.8372,
+    "cohen_kappa": 0.72,
     "confusion_rows_gold_cols_machine": [
       [
         300,
-        89
+        84
       ],
       [
         0,
-        211
+        216
       ]
     ]
   },
   "inter_coder": {
     "n": 566,
-    "cohen_kappa": 0.6688,
-    "agreement": 0.8445
+    "cohen_kappa": 0.6654,
+    "agreement": 0.8428
   },
   "gold_source": {
-    "agreed": 477,
-    "adjudicated": 123
+    "agreed": 478,
+    "adjudicated": 122
   }
 }

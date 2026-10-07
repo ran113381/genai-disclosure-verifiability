@@ -13,4 +13,4 @@ Binary human labeling of whether an MD&A passage is a genuine enterprise GenAI d
 - **Metric calculation later**: Dictionary precision, recall and F1 require the final_label merged with Sampling_Metadata.
 - **Important boundary**: Label disclosure relevance, not true internal deployment scale. The passage can be coded 1 if it substantively discloses GenAI-related exploration, adoption, products, platforms, or applications.
 
-Sampling: 300 dictionary-hit (random) + 150 dictionary non-hit near-miss (hard AI-context) + 150 dictionary non-hit random. Two independent coders, all disagreements adjudicated (477 agreed + 123 adjudicated).
+Sampling: 300 dictionary-hit (random) + 150 dictionary non-hit near-miss (hard AI-context) + 150 dictionary non-hit random. Two independent coders, all disagreements adjudicated (478 agreed + 122 adjudicated).

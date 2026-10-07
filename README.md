@@ -5,7 +5,7 @@ Dictionaries, gold-standard annotations, derived data, and code for the paper:
 > **From topic salience to verifiability: constructing and validating a measurement system for corporate generative artificial intelligence disclosure texts**
 > （从话题显著性到可验证性：企业生成式人工智能披露文本的测度体系构建与验证）
 
-The paper builds a verifiability measurement system for corporate technology-disclosure text: a three-tier GenAI dictionary with time-validity constraints, segment-level scoring on five implementation cues (implementation verbs, time anchoring, named products/tools, identifiable partners, measurable rollout), and a three-way classification of first annual-report GenAI disclosures into *verifiable*, *soft-substantive*, and *symbolic*. The measure is validated in two stages against human gold standards: a **600-passage binary identification** gold standard (dictionary vs. adjudicated human labels, Cohen's κ = 0.703, recall 1.00) for the dictionary-matching stage, and a **180-segment three-way verifiability** gold standard (two-coder reliability κ = 0.949) for the scoring stage. It is further cross-checked by blind classification from two independent large language models and SHAP-based interpretable machine learning, and externally validated against Chinese A-share market reactions (2015–2024).
+The paper builds a verifiability measurement system for corporate technology-disclosure text: a three-tier GenAI dictionary with time-validity constraints, segment-level scoring on five implementation cues (implementation verbs, time anchoring, named products/tools, identifiable partners, measurable rollout), and a three-way classification of first annual-report GenAI disclosures into *verifiable*, *soft-substantive*, and *symbolic*. The measure is validated in two stages against human gold standards: a **600-passage binary identification** gold standard (dictionary vs. adjudicated human labels, Cohen's κ = 0.720, recall 1.00) for the dictionary-matching stage, and a **180-segment three-way verifiability** gold standard (two-coder reliability κ = 0.949) for the scoring stage. It is further cross-checked by blind classification from two independent large language models and SHAP-based interpretable machine learning, and externally validated against Chinese A-share market reactions (2015–2024).
 
 ## Repository structure
 
@@ -23,12 +23,13 @@ gold_standard/
   04_kappa_results.xlsx               Inter-coder reliability (Cohen's κ = 0.949)
   coding_codebook.md                  Coding rules given to the blind coders
   # Stage 1 — dictionary identification (600 passages, binary)
-  identification_gold_standard_600.xlsx                600 passages, two coders fully
-                                      adjudicated (477 agreed + 123 adjudicated); machine vs gold
+  identification_gold_standard_600.xlsx                600 passages, two coders, all 122
+                                      disagreements adjudicated (478 agreed + 122 adjudicated);
+                                      machine vs gold
   identification_annotation_coder1_2_adjudicated.xlsx  Blind annotation + adjudication +
                                       sampling metadata + codebook (4 sheets)
   identification_codebook.md          Binary coding rules (GenAI disclosure vs. not)
-  identification_metrics.json         Reproduced metrics (κ = 0.703, acc 0.852, recall 1.00)
+  identification_metrics.json         Reproduced metrics (κ = 0.720, acc 0.860, recall 1.00)
   # Stage 3 — third-party LLM blind validation (Section 3.5)
   llm_blind_validation_180.csv        Per-segment blind predictions of both LLMs (Claude
                                       Sonnet 4.5, GPT-5.5) alongside the human consensus
@@ -55,7 +56,7 @@ code/
                                       API keys are read from a local file, not included)
   07_shap_interpretability.py         LightGBM + SHAP transparency analyses (A1/A2/B)
   08_gold_standard_evaluation.py      Two-stage human-gold-standard evaluation; reproduces
-                                      κ = 0.703 (identification) and κ = 0.231 (verifiability)
+                                      κ = 0.720 (identification) and κ = 0.231 (verifiability)
   09_llm_blind_validation.py          Section 3.5 — re-scores the two LLMs' blind predictions
                                       against the human consensus (κ = 0.70 Claude / 0.54 GPT)
   10_benchmark_learned_classifiers.py Table 5 — cue rule vs learned classifiers on the human
@@ -77,6 +78,12 @@ A segment is **verifiable** when the cues form one of the following combinations
 `(completion AND (quant OR artifact OR partner))` or `(quant AND artifact AND (partner OR current))` or `(partner AND artifact AND completion)`.
 
 Firm-year type: **verifiable** if the firm-year has at least one verifiable segment; **soft-substantive** if it has none but has at least one semantically substantive segment; **symbolic** otherwise.
+
+## Identification gold standard: adjudication
+
+The 600-passage identification gold standard was blind double-coded (coders unaware of dictionary-hit status). The two coders initially agreed on 478 of the 600 passages; the 122 initial disagreements were adjudicated by the authors, who reviewed each case individually on the basis of AI-assisted draft rationales. The resulting dictionary-vs-human metrics are TP/FP/FN/TN = 216/84/0/300, precision 0.720, recall 1.00, accuracy 0.860, and Cohen's κ = 0.720 (`gold_standard/identification_metrics.json`; reproduced by `code/08_gold_standard_evaluation.py`).
+
+This is the final adjudication round. The previous version (211 GenAI-related passages, κ = 0.703) is preserved in the git history. The same 600-passage gold standard is shared with a companion study by the same authors.
 
 ## Data licensing boundary
 
